@@ -1,0 +1,50 @@
+
+
+printboard(x,y,board){
+	i = 0;
+	j = 0;
+	while( i < x) {  
+	  j = 0;
+	  while( j < y){ 
+	     putc_(board[i][j]);
+	     putc_(' ');
+	     j = j+1;
+	  }
+	  putc_('\n');
+	  i = i + 1; 
+	}
+}
+
+
+main(){
+  
+  who = 0;
+  array b[5][5] = '*';
+  array term[2] = '*';
+  //x = 0;
+  //y = 0; 
+  input = 1;
+  term[0] = '#';
+  term[1] = '@';
+  while(input != 0){
+     puts("you are ");
+     putc(term[who]);
+     puts("enter x,y");
+     geti(x);
+	puti(x);
+     geti(y);
+    putc(b[x][y]);
+     if(b[x][y] == '*' ){
+         b[x][y] = term[who];
+         if(who == 0) {who = 1;}
+         else {who = 0;} 
+         puts("continue? yes 1 | end 0");
+   	 geti(input);
+     }else{
+      puts("occupied; re-enter x,y please");
+    }   
+    printboard(5,5,b);
+  }
+}
+main();
+

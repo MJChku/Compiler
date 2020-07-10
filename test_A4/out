@@ -1,0 +1,18 @@
+	push	6
+	push	sp
+	add	
+	pop	sp
+	push 	sb
+	push 	0
+	add 	
+	pop 	sb[0]
+	push	5	pop	sb[1]
+	push	100
+	push	sp[-1]	push	sp[-1]	push	sp[-1]	push	sp[-1]	push	sp[-1]
+	push	sb[0]	push	2	add		pop	in	pop	sb[in]
+	push	sb[0]	push	3	add		pop	in	pop	sb[in]
+	push	sb[0]	push	4	add		pop	in	pop	sb[in]
+	push	sb[0]	push	5	add		pop	in	pop	sb[in]
+	push	sb[0]	push	6	add		pop	in	pop	sb[in]
+	pop	in
+	push	2

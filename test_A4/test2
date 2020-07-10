@@ -1,0 +1,10 @@
+func(){
+     puts("enter x,y");
+     geti(x);
+     geti(y);
+}
+
+x = 1;
+//array b[5][5] = 100;
+func();
+//printf(b);

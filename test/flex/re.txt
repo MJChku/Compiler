@@ -1,0 +1,288 @@
+DIGIT [0-9]
+
+floating point: {DIGIT}+"."{DIGIT}*
+
+	   x	      match the character 'x'
+	   .	      any character (byte) except newline
+	   [xyz]      a "character class"; in this case, the pattern
+			matches either an 'x', a 'y', or a 'z'
+	   [abj-oZ]   a "character class" with a range in it; matches
+			an 'a', a 'b', any letter from 'j' through 'o',
+			or a 'Z'
+	   [^A-Z]     a "negated character class", i.e., any character
+			but those in the class.	 In this case, any
+			character EXCEPT an uppercase letter.
+	   [^A-Z\n]   any character EXCEPT an uppercase letter or
+			a newline
+	   r*	      zero or more r's, where r is any regular expression
+	   r+	      one or more r's
+	   r?	      zero or one r's (that is, "an optional r")
+	   r{2,5}     anywhere from two to five r's
+	   r{2,}      two or more r's
+	   r{4}	      exactly 4 r's
+	   {name}     the expansion of the "name" definition
+		      (see above)
+	   "[xyz]\"foo"
+		      the literal string: [xyz]"foo
+	   \X	      if X is an 'a', 'b', 'f', 'n', 'r', 't', or 'v',
+			then the ANSI-C interpretation of \x.
+			Otherwise, a literal 'X' (used to escape
+			operators such as '*')
+	   \0	      a NUL character (ASCII code 0)
+	   \123	      the character with octal value 123
+	   \x2a	      the character with hexadecimal value 2a
+	   (r)	      match an r; parentheses are used to override
+			precedence (see below)
+
+	   rs	      the regular expression r followed by the
+			regular expression s; called "concatenation"
+
+	   r|s	      either an r or an s
+
+	   r/s	      an r but only if it is followed by an s.	The
+			text matched by s is included when determining
+			whether this rule is the "longest match",
+			but is then returned to the input before
+			the action is executed.	 So the action only
+			sees the text matched by r.  This type
+			of pattern is called trailing context".
+			(There are some combinations of r/s that flex
+			cannot match correctly; see notes in the
+			Deficiencies / Bugs section below regarding
+			"dangerous trailing context".)
+	   ^r	      an r, but only at the beginning of a line (i.e.,
+			which just starting to scan, or right after a
+			newline has been scanned).
+	   r$	      an r, but only at the end of a line (i.e., just
+			before a newline).  Equivalent to "r/\n".
+
+		      Note that flex's notion of "newline" is exactly
+		      whatever the C compiler used to compile flex
+		      interprets '\n' as; in particular, on some DOS
+		      systems you must either filter out \r's in the
+		      input yourself, or explicitly use r/\r\n for "r$".
+
+	   <s>r	      an r, but only in start condition s (see
+			below for discussion of start conditions)
+	   <s1,s2,s3>r
+		      same, but in any of start conditions s1,
+			s2, or s3
+	   <*>r	      an r in any start condition, even an exclusive one.
+
+	   <<EOF>>    an end-of-file
+	   <s1,s2><<EOF>>
+		      an end-of-file when in start condition s1 or s2
+
+
+A negated character class such as the example "[^A-
+	      Z]"  above  will match a newline unless "\n" (or an
+	      equivalent escape sequence) is one of  the  charac-
+	      ters  explicitly	present	 in the negated character
+	      class (e.g., "[^A-Z\n]").
+
+
+	      The  following  will  result  in	'$'  or '^' being
+	      treated as a normal character:
+
+		  foo|(bar$)
+		  foo|^bar
+
+	      If what's wanted is a "foo" or a bar-followed-by-a-
+	      newline,	the  following could be used (the special
+	      '|' action is explained below):
+
+		  foo	   |
+		  bar$	   /* action goes here */
+
+
+
+       If no match is found, then the default rule  is	executed:
+       the  next character in the input is considered matched and
+       copied to the standard output.  Thus, the  simplest  legal
+       flex input is:
+
+
+
+       -      ECHO copies yytext to the scanner's output.
+
+       -      BEGIN  followed  by  the	name of a start condition
+	      places the scanner in the corresponding start  con-
+	      dition (see below).
+
+       -      REJECT  directs  the  scanner  to proceed on to the
+	      "second best" rule which matched the  input  (or	a
+	      prefix  of  the  input).	 The  rule  is	chosen as
+	      described above in "How the Input is Matched",  and
+	      yytext  and  yyleng  set	up appropriately.  It may
+	      either be one which matched as  much  text  as  the
+	      originally  chosen  rule but came later in the flex
+	      input file, or one which matched	less  text.   For
+	      example, the following will both count the words in
+	      the input and call the routine  special()	 whenever
+	      "frob" is seen:
+
+			  int word_count = 0;
+		  %%
+
+		  frob	      special(); REJECT;
+		  [^ \t\n]+   ++word_count;
+
+	      Without the REJECT, any "frob"'s in the input would
+	      not be counted as words, since the scanner normally
+	      executes	only  one  action  per	token.	 Multiple
+	      REJECT's are allowed, each  one  finding	the  next
+	      best  choice  to	the  currently	active rule.  For
+	      example, when the following scanner scans the token
+	      "abcd", it will write "abcdabcaba" to the output:
+       -      ECHO copies yytext to the scanner's output.
+
+       -      BEGIN  followed  by  the	name of a start condition
+	      places the scanner in the corresponding start  con-
+	      dition (see below).
+
+       -      REJECT  directs  the  scanner  to proceed on to the
+	      "second best" rule which matched the  input  (or	a
+	      prefix  of  the  input).	 The  rule  is	chosen as
+	      described above in "How the Input is Matched",  and
+	      yytext  and  yyleng  set	up appropriately.  It may
+	      either be one which matched as  much  text  as  the
+	      originally  chosen  rule but came later in the flex
+	      input file, or one which matched	less  text.   For
+	      example, the following will both count the words in
+	      the input and call the routine  special()	 whenever
+	      "frob" is seen:
+
+			  int word_count = 0;
+		  %%
+
+		  frob	      special(); REJECT;
+		  [^ \t\n]+   ++word_count;
+
+	      Without the REJECT, any "frob"'s in the input would
+	      not be counted as words, since the scanner normally
+	      executes	only  one  action  per	token.	 Multiple
+	      REJECT's are allowed, each  one  finding	the  next
+	      best  choice  to	the  currently	active rule.  For
+	      example, when the following scanner scans the token
+	      "abcd", it will write "abcdabcaba" to the output:
+
+
+
+       -      yymore()	tells  the  scanner that the next time it
+	      matches a rule, the corresponding token  should  be
+	      appended	onto  the  current value of yytext rather
+	      than replacing it.  For example,	given  the  input
+	      "mega-kludge"  the following will write "mega-mega-
+	      kludge" to the output:
+
+		  %%
+		  mega-	   ECHO; yymore();
+		  kludge   ECHO;
+
+
+
+       -      yyless(n) returns all but the first n characters of
+	      the current token back to the input  stream,  where
+	      they  will  be rescanned when the scanner looks for
+	      the next match.  yytext  and  yyleng  are	 adjusted
+	      appropriately  (e.g., yyleng will now be equal to n
+	      ).  For example, on the input "foobar" the  follow-
+	      ing will write out "foobarbar":
+
+		  %%
+		  foobar    ECHO; yyless(3);
+		  [a-z]+    ECHO;
+
+	      An  argument  of	0 to yyless will cause the entire
+	      current input string to be scanned  again.   Unless
+	      you've  changed  how  the scanner will subsequently
+	      process its input (using BEGIN, for example),  this
+	      will result in an endless loop.
+
+
+
+
+       -      unput(c) puts the character c back onto  the  input
+	      stream.	It  will  be  the next character scanned.
+	      The following action will take  the  current  token
+	      and  cause it to be rescanned enclosed in parenthe-
+	      ses.
+
+		  {
+		  int i;
+		  /* Copy yytext because unput() trashes yytext */
+		  char *yycopy = strdup( yytext );
+		  unput( ')' );
+		  for ( i = yyleng - 1; i >= 0; --i )
+		      unput( yycopy[i] );
+		  unput( '(' );
+		  free( yycopy );
+		  }
+
+	      Note that since each unput() puts the given charac-
+	      ter  back	 at  the  beginning  of the input stream,
+	      pushing back strings must be done back-to-front.
+
+
+     -      input() reads the next  character	 from  the  input
+	      stream.	For  example, the following is one way to
+	      eat up C comments:
+
+
+
+     -      YY_FLUSH_BUFFER	flushes	 the  scanner's	 internal
+	      buffer so that the next time the	scanner	 attempts
+	      to  match	 a token, it will first refill the buffer
+	      using YY_INPUT (see The Generated Scanner,  below).
+	      This  action  is a special case of the more general
+	      yy_flush_buffer() function, described below in  the
+	      section Multiple Input Buffers.
+
+       -      yyterminate()  can  be  used  in	lieu  of a return
+	      statement in an action.  It terminates the  scanner
+	      and returns a 0 to the scanner's caller, indicating
+	      "all done".   By	default,  yyterminate()	 is  also
+	      called when an end-of-file is encountered.  It is a
+	      macro and may be redefined.
+
+
+
+       Start conditions are declared in the  definitions  (first)
+       section of the input using unindented lines beginning with
+       either %s or %x followed by a list of names.   The  former
+       declares	 inclusive start conditions, the latter exclusive
+       start conditions.  A start condition  is	 activated  using
+       the  BEGIN  action.   Until  the next BEGIN action is exe-
+       cuted, rules with the given start condition will be active
+       and  rules  with	 other start conditions will be inactive.
+       If the start condition is inclusive, then  rules	 with  no
+       start  conditions  at  all  will also be active.	 If it is
+       exclusive, then only rules qualified with the start condi-
+       tion  will  be  active.
+
+
+
+       Also  note  that the special start-condition specifier <*>
+       matches every start condition.  Thus,  the  above  example
+       could also have been written;
+
+	   %x example
+	   %%
+
+	   <example>foo	  do_something();
+
+	   <*>bar    something_else();
+
+       The default rule (to ECHO any unmatched character) remains
+       active in start conditions.  It is equivalent to:
+
+	   <*>.|\n     ECHO;
+
+
+       BEGIN(0) returns to the	original  state	 where	only  the
+       rules with no start conditions are active.  This state can
+       also be referred to as the start-condition  "INITIAL",  so
+       BEGIN(INITIAL)  is equivalent to BEGIN(0).  (The parenthe-
+       ses around the start condition name are not  required  but
+       are considered good style.)	
+

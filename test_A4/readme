@@ -1,0 +1,42 @@
+COMP3235 A3 C5C & NAS
+============================================================
+
+c5c - compiler -> [make c5c]
+nas - the New Assembler-Simulator for a simulated stack machine [make nas]
+
+Example programs:
+
+max.sc            - get maximum of two numbers
+fact.sc           - factorial
+recursive-fact.sc - recursive factorial
+rev-c.sc          - recursive reverse characters of string
+demo.sc           - demo of some features
+
+To make c5c and nas:
+
+    make makeall 
+    
+To remake c5c and nas:
+
+    make remake
+
+To make all testing programs:
+
+    make testall
+    
+To clear everyting generated:
+
+    make cleanall
+    
+Note:
+1.  Functions search variables in all the stacks that are alive.
+    
+2.  If argument variable collision occurs in function, the outer variable will
+    not be modified.
+    
+3.  Functions can be defined in different scopes, and can only be called when it
+    is alive, just like variables.
+    
+4.  Register in is used to support void functions
+    
+

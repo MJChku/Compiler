@@ -1,0 +1,15 @@
+KM with 30 original on lineitem_5M ----- 50.287
+reduce 30.222
+map 25.666
+reduce 10.56e-4
+map 2
+Execution time: 555
+KM with 30 original on lineitem_5M ----- 50.287
+reduce 30.222
+map 25.666
+Execution time: 54533
+TPCH11 with 30 original on partsupp_5M ----- 50.287
+reduce 30.222
+map 25.666
+Execution: 120.544
+

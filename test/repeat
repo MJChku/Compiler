@@ -1,0 +1,33 @@
+display;
+repeat(30){
+  draw;
+  move(3,-4);
+  draw;
+  move(-2,2);
+  draw;
+  move(1,0);
+  draw;
+  move(-1,1);
+  draw;
+}
+
+move(10,10);
+repeat(30){
+  draw;
+  move(-3,4);
+  draw;
+  move(2,-2);
+  draw;
+  move(-1,0);
+  draw;
+  move(1,-1);
+  draw;
+}
+
+line_ 1 3;
+
+line 1 10 10 20;
+start;
+
+
+//reversely as indicated in the readme file;
